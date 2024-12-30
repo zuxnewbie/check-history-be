@@ -1,1 +1,2 @@
-export * from 'src/abstracts/common/AQueries.abstract';
+export * from './AQueries.abstract';
+export * as CoreRes from './Response.abstract';
