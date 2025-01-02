@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { TokensController } from './tokens.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TokenEntity } from './token.entity';
-import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
+import { TokenEntity, TokenSchema } from './token.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TokenEntity]), JwtModule],
+  imports: [
+    MongooseModule.forFeature([
+      { name: TokenEntity.name, schema: TokenSchema },
+    ]),
+  ],
   controllers: [TokensController],
   providers: [TokensService],
   exports: [TokensService],

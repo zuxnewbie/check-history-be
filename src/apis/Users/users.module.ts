@@ -1,16 +1,15 @@
 import { Global, Module, forwardRef } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
-import { TokenEntity } from '../tokens/token.entity';
+import { UserEntity, UserSchema } from './user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Global()
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, TokenEntity]),
+    MongooseModule.forFeature([{ name: UserEntity.name, schema: UserSchema }]),
     JwtModule,
     UsersModule,
     forwardRef(() => AuthModule),

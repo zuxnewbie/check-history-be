@@ -1,18 +1,19 @@
-import { ABaseModal } from 'src/abstracts/models';
-import { UserEntity } from 'src/apis/Users/user.entity';
-import { IToken } from 'src/interfaces/models';
-import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import { UserEntity } from '../Users/user.entity';
 
-@Entity('tokens')
-export class TokenEntity extends ABaseModal implements IToken {
-  @Column('text')
-  @Index({ fulltext: true })
+export type TokenDocument = TokenEntity & Document;
+
+@Schema({ collection: 'tokens' })
+export class TokenEntity {
+  @Prop({ type: String, required: true })
   token_code: string;
 
-  @Column('text')
+  @Prop({ type: String, required: true })
   token_key: string;
 
-  @OneToOne(() => UserEntity)
-  @JoinColumn({ name: 'token_user_id' })
+  @Prop({ type: String, ref: 'UserEntity' })
   token_user: UserEntity;
 }
+
+export const TokenSchema = SchemaFactory.createForClass(TokenEntity);

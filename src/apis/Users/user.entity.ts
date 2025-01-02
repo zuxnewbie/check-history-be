@@ -1,60 +1,48 @@
-import { ABaseModal } from 'src/abstracts/models';
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
-import { IUser } from 'src/interfaces/models';
-import { UtilTransform } from 'src/utils/transforms.util';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity('users')
-export class UserEntity extends ABaseModal implements IUser {
-  @Column({ length: 100, unique: true })
+export type UserDocument = UserEntity & Document;
+
+@Schema({ collection: 'users' })
+export class UserEntity {
+  @Prop({ type: String, required: true, unique: true })
   user_email: string;
 
-  @Column({ length: 50 })
-  user_name: string;
-
-  @Column({ length: 100, select: false })
+  @Prop({ type: String, required: true })
   user_pass: string;
 
-  @Column({ length: 11, unique: true })
+  @Prop({ type: String, required: true })
+  user_name: string;
+
+  @Prop({ type: String, required: true })
   user_phone: string;
 
-  @Column({ length: 10 })
+  @Prop({ type: String, required: true })
   user_gender: string;
 
-  @Column({ type: 'tinyint', default: false })
+  @Prop({ type: Boolean, default: false })
   user_isRootAdmin: boolean;
 
-  @Column('tinyint', { default: false })
+  @Prop({ type: Boolean, default: false })
   user_isBlocked: boolean;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, { nullable: true })
-  @JoinColumn({ name: 'deleted_by' })
+  @Prop({ type: String, ref: 'UserEntity', nullable: true })
   deletedBy: UserEntity;
 
-  @Column({ name: 'deleted_at', nullable: true })
+  @Prop({ type: Date, nullable: true })
   deletedAt: Date;
 
-  @Column({ name: 'is_deleted', type: 'tinyint', default: false })
-  isDeleted: boolean;
+  @Prop({ type: Date, nullable: true })
+  createdAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, { nullable: true })
-  @JoinColumn({ name: 'created_by' })
+  @Prop({ type: Date, nullable: true })
+  isDeleted: Date;
+
+  @Prop({ type: Date, nullable: true })
   createdBy: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, { nullable: true })
-  @JoinColumn({ name: 'updated_by' })
+  @Prop({ type: Date, nullable: true })
   updatedBy: UserEntity;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hasPasswordBeforeTransform() {
-    if (this.user_pass)
-      this.user_pass = await UtilTransform.hashPassword(this.user_pass);
-  }
 }
+
+export const UserSchema = SchemaFactory.createForClass(UserEntity);

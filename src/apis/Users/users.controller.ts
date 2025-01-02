@@ -106,15 +106,15 @@ export class UsersController {
     });
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Xóa vĩnh viễn người dùng' })
-  async removeById(@Param('id') id: string) {
-    const userDeleted = await this.usersService.remove(id);
-    if (!userDeleted) {
-      throw new BadRequestException('Xóa người dùng thất bại');
-    }
-    return new CoreRes.OK({
-      message: 'Xóa người dùng thành công',
-    });
-  }
+  // @Delete(':id')
+  // @ApiOperation({ summary: 'Xóa vĩnh viễn người dùng' })
+  // async removeById(@Param('id') id: string) {
+  //   const userDeleted = await this.usersService.remove(id);
+  //   if (!userDeleted) {
+  //     throw new BadRequestException('Xóa người dùng thất bại');
+  //   }
+  //   return new CoreRes.OK({
+  //     message: 'Xóa người dùng thành công',
+  //   });
+  // }
 }
