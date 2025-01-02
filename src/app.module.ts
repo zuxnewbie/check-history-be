@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard } from '@nestjs/throttler';
+// import { APP_GUARD } from '@nestjs/core';
+// import { ThrottlerGuard } from '@nestjs/throttler';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TestModule } from './apis/RiotApi/riotapi.module';
+import { ChampionV3Module } from './apis/Champion-V3/champion_v3.module';
 
 @Module({
   imports: [
-    TestModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -18,7 +17,7 @@ import { TestModule } from './apis/RiotApi/riotapi.module';
       }),
       inject: [ConfigService],
     }),
-    TestModule,
+    ChampionV3Module,
   ],
   controllers: [AppController],
   providers: [

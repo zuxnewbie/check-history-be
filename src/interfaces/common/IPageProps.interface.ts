@@ -1,6 +1,6 @@
-import { IQueries } from ".";
+import { IQueries } from '.';
 
 export interface IPageProps {
-    params: { id: string; [key: string]: string };
-    searchParams?: IQueries;
+  params: { id: string; [key: string]: string };
+  searchParams?: IQueries;
 }

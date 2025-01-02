@@ -19,9 +19,7 @@ async function bootstrap() {
   app.use(helmet());
   app.use(compression());
   app.enableCors({
-    origin: [
-      process.env.CLIENT_HOST_CORS,
-    ],
+    origin: [process.env.CLIENT_HOST_CORS],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
@@ -42,6 +40,5 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
   await app.listen(9001);
-
 }
 bootstrap();

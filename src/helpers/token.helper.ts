@@ -53,7 +53,7 @@ export class HelperToken {
       return payload;
     } catch (error) {
       throw new UnauthorizedException(
-        'Session token hết hạn, vui lòng đăng nhập lại',
+        `Session token hết hạn, vui lòng đăng nhập lại, ${error}`,
       );
     }
   }
