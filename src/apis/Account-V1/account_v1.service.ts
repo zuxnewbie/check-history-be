@@ -3,12 +3,12 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
-export class SummonerV4Service {
+export class AccountV1Service {
   private readonly apiKey = process.env.RIOT_API_KEY;
 
   constructor(private readonly httpService: HttpService) {}
 
-  async getAll(platform: string): Promise<any> {
+  async getAllAccount(platform: string): Promise<any> {
     const url = `https://${platform}.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=${this.apiKey}`;
     try {
       const response = await lastValueFrom(

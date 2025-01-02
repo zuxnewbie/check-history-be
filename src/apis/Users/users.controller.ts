@@ -45,18 +45,18 @@ export class UsersController {
     });
   }
 
-  @Get(`${CONST_API_COMMON.SEARCH}`)
-  @ApiOperation({ summary: 'Tìm kiếm người dùng' })
-  async search(
-    @Query()
-    queries: AQueries,
-  ) {
-    const results = await this.usersService.search(queries);
-    return new CoreRes.OK({
-      message: 'Tìm kiếm người dùng thành công',
-      metadata: results,
-    });
-  }
+  // @Get(`${CONST_API_COMMON.SEARCH}`)
+  // @ApiOperation({ summary: 'Tìm kiếm người dùng' })
+  // async search(
+  //   @Query()
+  //   queries: AQueries,
+  // ) {
+  //   const results = await this.usersService.search(queries);
+  //   return new CoreRes.OK({
+  //     message: 'Tìm kiếm người dùng thành công',
+  //     metadata: results,
+  //   });
+  // }
 
   @Get(':id')
   @ApiOperation({ summary: 'Tìm kiếm người dùng bằng ID' })
