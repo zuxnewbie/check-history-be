@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { MESS_ERROR_VN } from 'src/constants';
 
 export class LoginDto {
@@ -35,6 +35,14 @@ export class RegisterDto {
   user_pass: string;
 }
 
+export class CodeAuthDto {
+  @IsNotEmpty({ message: '_id không được để trống' })
+  _id: string;
+
+  @IsNotEmpty({ message: 'code không được để trống' })
+  code: string;
+}
+
 export class ResetPasswordDto {
   @IsEmail({}, { message: MESS_ERROR_VN.EMAIL })
   @ApiProperty({ default: 'tocchienofvu@gmail.com' })
@@ -57,4 +65,18 @@ export class ResetPasswordDto {
     }),
   })
   user_confirmPass: string;
+}
+
+export class ChangePasswordAuthDto {
+  @IsNotEmpty({ message: 'code không được để trống' })
+  code: string;
+
+  @IsNotEmpty({ message: 'password không được để trống' })
+  user_pass: string;
+
+  @IsNotEmpty({ message: 'confirmPassword không được để trống' })
+  user_confirmPass: string;
+
+  @IsNotEmpty({ message: 'email không được để trống' })
+  user_email: string;
 }

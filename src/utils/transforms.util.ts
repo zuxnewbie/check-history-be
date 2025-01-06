@@ -3,6 +3,15 @@ export class UtilTransform {
   static async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
   }
+  static async comparePassword({
+    password,
+    passwordHashed,
+  }: {
+    password: string;
+    passwordHashed: string;
+  }) {
+    return await bcrypt.compare(password, passwordHashed);
+  }
   static randomId(): string {
     const characters =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$';

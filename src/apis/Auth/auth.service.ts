@@ -1,12 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { LoginDto } from './auth.dto';
-import { UtilCompares } from 'src/utils';
+import {
+  ChangePasswordAuthDto,
+  CodeAuthDto,
+  LoginDto,
+  RegisterDto,
+} from './auth.dto';
 import { IResponseLogin } from 'src/interfaces/common';
 import { User, UserDocument } from '../Users/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TokensService } from '../tokens/tokens.service';
+import { UsersService } from '../Users/users.service';
+import { UtilTransform } from '@/utils';
 
 @Injectable()
 // @UseInterceptors(CacheInterceptor)
@@ -14,6 +20,7 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private tokenService: TokensService,
+    private usersService: UsersService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<any> {
@@ -35,7 +42,7 @@ export class AuthService {
     // 2. Check password has correct
     if (!findUser.user_isRootAdmin) {
       // Check if the password is correct
-      const isMatchedPass = await UtilCompares.comparePassword({
+      const isMatchedPass = await UtilTransform.comparePassword({
         password: user_pass,
         passwordHashed: findUser.user_pass,
       });
@@ -71,6 +78,38 @@ export class AuthService {
     console.log('dataUser:::', dataUser, new Date());
 
     return true;
+  }
+
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user) return null;
+    const isValidPassword = await UtilTransform.comparePassword({
+      password: pass,
+      passwordHashed: user.user_pass,
+    });
+
+    if (!isValidPassword) return null;
+    return user;
+  }
+
+  async register(registerDto: RegisterDto) {
+    return await this.usersService.register(registerDto);
+  }
+
+  async checkCode(data: CodeAuthDto) {
+    return await this.usersService.handleActive(data);
+  }
+
+  async retryActive(data: string) {
+    return await this.usersService.retryActive(data);
+  }
+
+  async retryPassword(data: string) {
+    return await this.usersService.retryPassword(data);
+  }
+
+  async changePassword(data: ChangePasswordAuthDto) {
+    return await this.usersService.changePassword(data);
   }
 
   async getMe(req: Request): Promise<any> {

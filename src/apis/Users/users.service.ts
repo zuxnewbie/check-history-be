@@ -10,7 +10,11 @@ import { Request } from 'express';
 import { CreateUserDto } from './user.dto';
 import { EGender } from 'src/enums/common';
 import dayjs from 'dayjs';
-import { RegisterDto } from '../Auth/auth.dto';
+import {
+  ChangePasswordAuthDto,
+  CodeAuthDto,
+  RegisterDto,
+} from '../Auth/auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
@@ -192,121 +196,121 @@ export class UsersService {
     };
   }
 
-  // async handleActive(data: CodeAuthDto) {
-  //   const user = await this.userModel.findOne({
-  //     _id: data._id,
-  //     codeId: data.code,
-  //   });
-  //   if (!user) {
-  //     throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
-  //   }
+  async handleActive(data: CodeAuthDto) {
+    const user = await this.userModel.findOne({
+      _id: data._id,
+      codeId: data.code,
+    });
+    if (!user) {
+      throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
+    }
 
-  //   //check expire code
-  //   const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+    //check expire code
+    const isBeforeCheck = dayjs().isBefore(user.codeExpired);
 
-  //   if (isBeforeCheck) {
-  //     //valid => update user
-  //     await this.userModel.updateOne(
-  //       { _id: data._id },
-  //       {
-  //         isActive: true,
-  //       },
-  //     );
-  //     return { isBeforeCheck };
-  //   } else {
-  //     throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
-  //   }
-  // }
+    if (isBeforeCheck) {
+      //valid => update user
+      await this.userModel.updateOne(
+        { _id: data._id },
+        {
+          isActive: true,
+        },
+      );
+      return { isBeforeCheck };
+    } else {
+      throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
+    }
+  }
 
-  // async retryActive(email: string) {
-  //   //check email
-  //   const user = await this.userModel.findOne({ email });
+  async retryActive(email: string) {
+    //check email
+    const user = await this.userModel.findOne({ email });
 
-  //   if (!user) {
-  //     throw new BadRequestException('Tài khoản không tồn tại');
-  //   }
-  //   if (user.isActive) {
-  //     throw new BadRequestException('Tài khoản đã được kích hoạt');
-  //   }
+    if (!user) {
+      throw new BadRequestException('Tài khoản không tồn tại');
+    }
+    if (user.user_isActive) {
+      throw new BadRequestException('Tài khoản đã được kích hoạt');
+    }
 
-  //   //send Email
-  //   const codeId = uuidv4();
+    //send Email
+    const codeId = UtilTransform.randomId();
 
-  //   //update user
-  //   await user.updateOne({
-  //     codeId: codeId,
-  //     codeExpired: dayjs().add(5, 'minutes'),
-  //   });
+    //update user
+    await user.updateOne({
+      codeId: codeId,
+      codeExpired: dayjs().add(5, 'minutes'),
+    });
 
-  //   //send email
-  //   this.mailerService.sendMail({
-  //     to: user.email, // list of receivers
-  //     subject: 'Activate your account at zux zux', // Subject line
-  //     template: 'register',
-  //     context: {
-  //       name: user?.name ?? user.email,
-  //       activationCode: codeId,
-  //     },
-  //   });
-  //   return { _id: user._id };
-  // }
+    //send email
+    this.mailerService.sendMail({
+      to: user.user_email, // list of receivers
+      subject: 'Activate your account at zux zux', // Subject line
+      template: 'register',
+      context: {
+        name: user?.user_name ?? user.user_email,
+        activationCode: codeId,
+      },
+    });
+    return { _id: user._id };
+  }
 
-  // async retryPassword(email: string) {
-  //   //check email
-  //   const user = await this.userModel.findOne({ email });
+  async retryPassword(email: string) {
+    //check email
+    const user = await this.userModel.findOne({ email });
 
-  //   if (!user) {
-  //     throw new BadRequestException('Tài khoản không tồn tại');
-  //   }
+    if (!user) {
+      throw new BadRequestException('Tài khoản không tồn tại');
+    }
 
-  //   //send Email
-  //   const codeId = uuidv4();
+    //send Email
+    const codeId = UtilTransform.randomId();
 
-  //   //update user
-  //   await user.updateOne({
-  //     codeId: codeId,
-  //     codeExpired: dayjs().add(5, 'minutes'),
-  //   });
+    //update user
+    await user.updateOne({
+      codeId: codeId,
+      codeExpired: dayjs().add(5, 'minutes'),
+    });
 
-  //   //send email
-  //   this.mailerService.sendMail({
-  //     to: user.email, // list of receivers
-  //     subject: 'Change your password account at @hoidanit', // Subject line
-  //     template: 'register',
-  //     context: {
-  //       name: user?.name ?? user.email,
-  //       activationCode: codeId,
-  //     },
-  //   });
-  //   return { _id: user._id, email: user.email };
-  // }
+    //send email
+    this.mailerService.sendMail({
+      to: user.user_email, // list of receivers
+      subject: 'Change your password account at checking history', // Subject line
+      template: 'register',
+      context: {
+        name: user?.user_name ?? user.user_email,
+        activationCode: codeId,
+      },
+    });
+    return { _id: user._id, email: user.user_email };
+  }
 
-  // async changePassword(data: ChangePasswordAuthDto) {
-  //   if (data.confirmPassword !== data.password) {
-  //     throw new BadRequestException(
-  //       'Mật khẩu/xác nhận mật khẩu không chính xác.',
-  //     );
-  //   }
+  async changePassword(data: ChangePasswordAuthDto) {
+    if (data.user_confirmPass !== data.user_pass) {
+      throw new BadRequestException(
+        'Mật khẩu/xác nhận mật khẩu không chính xác.',
+      );
+    }
 
-  //   //check email
-  //   const user = await this.userModel.findOne({ email: data.email });
+    //check email
+    const user = await this.userModel.findOne({ email: data.user_email });
 
-  //   if (!user) {
-  //     throw new BadRequestException('Tài khoản không tồn tại');
-  //   }
+    if (!user) {
+      throw new BadRequestException('Tài khoản không tồn tại');
+    }
 
-  //   //check expire code
-  //   const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+    //check expire code
+    const isBeforeCheck = dayjs().isBefore(user.codeExpired);
 
-  //   if (isBeforeCheck) {
-  //     //valid => update password
-  //     const newPassword = await UtilTransform.hashPassword(data.password);
-  //     await user.updateOne({ password: newPassword });
-  //     return { isBeforeCheck };
-  //   } else {
-  //     throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
-  //   }
-  // }
+    if (isBeforeCheck) {
+      //valid => update password
+      const newPassword = await UtilTransform.hashPassword(data.user_pass);
+      await user.updateOne({ password: newPassword });
+      return { isBeforeCheck };
+    } else {
+      throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
+    }
+  }
 
   private async initAdmin() {
     const findRootAdminByPhone = await this.userModel

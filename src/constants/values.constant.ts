@@ -3,6 +3,7 @@ export const CONST_VAL = {
   LIMIT_DEFAULT: 10,
   ENV_PROD: 'production',
   TOKEN_NAME: 'token',
+  REQ_USER: 'user',
 };
 
 export const CONST_API_COMMON = {

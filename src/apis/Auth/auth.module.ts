@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Token, TokenSchema } from '../tokens/token.schema';
 import { TokensModule } from '../tokens/tokens.module';
 import { User, UserSchema } from '../Users/user.schema';
+import { PassportModule } from '@nestjs/passport';
 
 @Global()
 @Module({
@@ -14,6 +15,7 @@ import { User, UserSchema } from '../Users/user.schema';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Token.name, schema: TokenSchema }]),
     forwardRef(() => TokensModule),
+    PassportModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
