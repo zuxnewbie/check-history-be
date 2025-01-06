@@ -19,12 +19,15 @@ import { SpectatorV5Module } from './apis/Spectator-V5/spectator_v5.module';
 import { SummonerV4Module } from './apis/Summoner-V4/summoner_v4.module';
 import { TournamentStubV5Module } from './apis/Tournament-Stub-V5/tournament_stub_v5.module';
 import { UsersModule } from './apis/Users/users.module';
-import { TokenEntity, TokenSchema } from './apis/tokens/token.entity';
-import { UserEntity, UserSchema } from './apis/Users/user.entity';
+import { Token, TokenSchema } from './apis/tokens/token.schema';
+import { User, UserSchema } from './apis/Users/user.schema';
 import { UsersController } from './apis/Users/users.controller';
 import { TokensController } from './apis/tokens/tokens.controller';
 import { UsersService } from './apis/Users/users.service';
 import { TokensService } from './apis/tokens/tokens.service';
+import { JwtService } from '@nestjs/jwt';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -37,9 +40,36 @@ import { TokensService } from './apis/tokens/tokens.service';
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([
-      { name: TokenEntity.name, schema: TokenSchema },
-      { name: UserEntity.name, schema: UserSchema },
+      { name: Token.name, schema: TokenSchema },
+      { name: User.name, schema: UserSchema },
     ]),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          // ignoreTLS: true,
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: '"No Reply" <no-reply@localhost>',
+        },
+        // preview: true,
+        template: {
+          dir: process.cwd() + '/src/templates/',
+          adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
     ChampionV3Module,
     AccountV1Module,
     AuthModule,
@@ -60,6 +90,7 @@ import { TokensService } from './apis/tokens/tokens.service';
     AppService,
     UsersService,
     TokensService,
+    JwtService,
     // {
     //   provide: APP_GUARD,
     //   // useClass: ThrottlerGuard,

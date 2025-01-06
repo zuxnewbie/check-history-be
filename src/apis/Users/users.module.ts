@@ -1,7 +1,7 @@
 import { Global, Module, forwardRef } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { UserEntity, UserSchema } from './user.entity';
+import { User, UserSchema } from './user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -9,9 +9,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 @Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: UserEntity.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule,
-    UsersModule,
     forwardRef(() => AuthModule),
   ],
   controllers: [UsersController],

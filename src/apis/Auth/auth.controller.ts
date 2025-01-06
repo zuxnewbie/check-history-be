@@ -5,7 +5,7 @@ import { LoginDto } from './auth.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IResponseLogin } from 'src/interfaces/common';
 import { UtilCookie } from 'src/utils';
-import { CONST_VAL } from 'src/constants';
+import { CONST_API_AUTH, CONST_VAL } from 'src/constants';
 import { CoreRes } from 'src/abstracts/common';
 // import { CreateCustomerDto } from '../customers/customer.dto';
 
@@ -14,7 +14,7 @@ import { CoreRes } from 'src/abstracts/common';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post(CONST_API_AUTH.LOGIN)
   @ApiOperation({ summary: 'Đăng nhập' })
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const dataLogin: IResponseLogin = await this.authService.login(loginDto);

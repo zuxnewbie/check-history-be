@@ -39,6 +39,6 @@ async function bootstrap() {
   console.log('process.env.SERVER_PORT:::', process.env.SERVER_PORT);
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
-  await app.listen(9001);
+  await app.listen(9002);
 }
 bootstrap();

@@ -9,7 +9,7 @@ import {
 export abstract class ABaseModal implements IBaseModel {
   @Column('uuid')
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  _id: string;
 
   @VersionColumn({ default: 1 })
   version: number;

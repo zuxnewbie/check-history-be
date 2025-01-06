@@ -4,7 +4,25 @@ import { MESS_ERROR_VN } from 'src/constants';
 
 export class LoginDto {
   @IsEmail({}, { message: MESS_ERROR_VN.EMAIL })
-  @ApiProperty({ default: 'admin@gmail.com' })
+  @ApiProperty({ default: 'tocchienofvu@gmail.com' })
+  user_email: string;
+
+  @ApiProperty({ default: 'admin123@' })
+  @MinLength(6, {
+    message: MESS_ERROR_VN.MIN_LENGTH({
+      field: 'Mật khẩu',
+      length: 6,
+    }),
+  })
+  user_pass: string;
+}
+
+export class RegisterDto {
+  @ApiProperty({ default: 'Name', required: true })
+  user_name: string;
+
+  @IsEmail({}, { message: MESS_ERROR_VN.EMAIL })
+  @ApiProperty({ default: 'tocchienofvu@gmail.com' })
   user_email: string;
 
   @ApiProperty({ default: 'admin123@' })
@@ -19,7 +37,7 @@ export class LoginDto {
 
 export class ResetPasswordDto {
   @IsEmail({}, { message: MESS_ERROR_VN.EMAIL })
-  @ApiProperty({ default: 'admin@gmail.com' })
+  @ApiProperty({ default: 'tocchienofvu@gmail.com' })
   user_email: string;
 
   @ApiProperty({ default: 'admin123' })

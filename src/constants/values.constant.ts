@@ -16,3 +16,10 @@ export const CONST_API_COMMON_FEATURES = {
   USERS: 'users',
   TOKENS: 'tokens',
 };
+
+export const CONST_API_AUTH = {
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  GET_ME: 'get_me',
+  RESET_PASSWORD: 'reset_password',
+};
