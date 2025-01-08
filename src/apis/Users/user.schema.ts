@@ -37,7 +37,7 @@ export class User extends ABaseModal implements IUser {
   @Prop({ type: String, default: false })
   codeId: string;
 
-  @Prop({ type: Date, default: false })
+  @Prop({ type: Date })
   codeExpired: Date;
 
   @Prop({ type: String, ref: 'User', nullable: true, name: 'deleted_by' })

@@ -61,10 +61,10 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Tìm kiếm người dùng bằng ID' })
   async findOneById(@Param('id') id: string) {
-    const blogs = await this.usersService.findOneById(id);
+    const users = await this.usersService.findOneById(id);
     return new CoreRes.OK({
       message: 'Lấy thông tin người dùng thành công',
-      metadata: blogs,
+      metadata: users,
     });
   }
 

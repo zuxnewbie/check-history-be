@@ -9,7 +9,7 @@ import { CONST_VAL } from 'src/constants';
 import { Request } from 'express';
 import { CreateUserDto } from './user.dto';
 import { EGender } from 'src/enums/common';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import {
   ChangePasswordAuthDto,
   CodeAuthDto,
@@ -160,6 +160,7 @@ export class UsersService {
 
   async register(registerDto: RegisterDto) {
     const { user_name, user_email, user_pass } = registerDto;
+    console.log('out');
 
     //check email
     const checkEmail = await this.findOneByEmail(user_email);
@@ -178,7 +179,7 @@ export class UsersService {
       user_pass: hashPW,
       isActive: false,
       codeId: codeId,
-      codeExpired: dayjs().add(5, 'minutes'),
+      codeExpired: dayjs().add(5, 'minutes').toDate(),
     });
 
     //send email
@@ -213,7 +214,7 @@ export class UsersService {
       await this.userModel.updateOne(
         { _id: data._id },
         {
-          isActive: true,
+          user_isActive: true,
         },
       );
       return { isBeforeCheck };
@@ -224,8 +225,10 @@ export class UsersService {
 
   async retryActive(email: string) {
     //check email
-    const user = await this.userModel.findOne({ email });
+    console.log('email', email);
 
+    const user = await this.userModel.findOne({ user_email: email });
+    console.log('user', user);
     if (!user) {
       throw new BadRequestException('Tài khoản không tồn tại');
     }
@@ -257,7 +260,7 @@ export class UsersService {
 
   async retryPassword(email: string) {
     //check email
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ user_email: email });
 
     if (!user) {
       throw new BadRequestException('Tài khoản không tồn tại');
@@ -293,19 +296,26 @@ export class UsersService {
     }
 
     //check email
-    const user = await this.userModel.findOne({ email: data.user_email });
+    const user = await this.userModel.findOne({ user_email: data.user_email });
+    console.log('user', user);
 
     if (!user) {
       throw new BadRequestException('Tài khoản không tồn tại');
     }
 
+    // Check if code matches
+    if (data.code !== user.codeId) {
+      throw new BadRequestException('Mã code không chính xác');
+    }
+
     //check expire code
     const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+    console.log('isBeforeCheck', isBeforeCheck, user.codeExpired);
 
     if (isBeforeCheck) {
       //valid => update password
       const newPassword = await UtilTransform.hashPassword(data.user_pass);
-      await user.updateOne({ password: newPassword });
+      await user.updateOne({ user_pass: newPassword });
       return { isBeforeCheck };
     } else {
       throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');

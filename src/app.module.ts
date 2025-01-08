@@ -28,6 +28,7 @@ import { TokensService } from './apis/tokens/tokens.service';
 import { JwtService } from '@nestjs/jwt';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { LoginAuthGuard, LoginStrategy } from './guards/login.guard';
 
 @Module({
   imports: [
@@ -91,6 +92,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UsersService,
     TokensService,
     JwtService,
+    LoginStrategy,
+    LoginAuthGuard,
     // {
     //   provide: APP_GUARD,
     //   // useClass: ThrottlerGuard,

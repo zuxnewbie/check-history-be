@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import {
   ChangePasswordAuthDto,
@@ -6,13 +6,13 @@ import {
   LoginDto,
   RegisterDto,
 } from './auth.dto';
-import { IResponseLogin } from 'src/interfaces/common';
 import { User, UserDocument } from '../Users/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TokensService } from '../tokens/tokens.service';
 import { UsersService } from '../Users/users.service';
 import { UtilTransform } from '@/utils';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 // @UseInterceptors(CacheInterceptor)
@@ -21,57 +21,73 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private tokenService: TokensService,
     private usersService: UsersService,
+    private jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<any> {
-    const { user_email, user_pass } = loginDto;
+  // set cookie for token
+  // async login(loginDto: LoginDto): Promise<any> {
+  //   const { user_email, user_pass } = loginDto;
 
-    const findUser = await this.userModel.findOne({
-      user_email,
-      isDeleted: false,
-    });
+  //   const findUser = await this.userModel.findOne({
+  //     user_email,
+  //     isDeleted: false,
+  //   });
 
-    console.log('findUser', findUser);
+  //   console.log('findUser', findUser);
 
-    if (!findUser) {
-      throw new BadRequestException(
-        'Người dùng không tồn tại trong hệ thống, vui lòng thử lại',
-      );
-    }
+  //   if (!findUser) {
+  //     throw new BadRequestException(
+  //       'Người dùng không tồn tại trong hệ thống, vui lòng thử lại',
+  //     );
+  //   }
 
-    // 2. Check password has correct
-    if (!findUser.user_isRootAdmin) {
-      // Check if the password is correct
-      const isMatchedPass = await UtilTransform.comparePassword({
-        password: user_pass,
-        passwordHashed: findUser.user_pass,
-      });
+  //   // Check if the user is active
+  //   if (!findUser.user_isActive) {
+  //     throw new BadRequestException(
+  //       'Tài khoản của bạn đã bị khóa, vui lòng liên hệ quản trị viên',
+  //     );
+  //   }
 
-      if (!isMatchedPass) {
-        throw new BadRequestException('Mật khẩu không đúng, vui lòng thử lại');
-      }
-    }
+  //   // 2. Check password has correct
+  //   if (!findUser.user_isRootAdmin) {
+  //     // Check if the password is correct
+  //     const isMatchedPass = await UtilTransform.comparePassword({
+  //       password: user_pass,
+  //       passwordHashed: findUser.user_pass,
+  //     });
 
-    // 3. Create token
-    const { token, user } = await this.tokenService.createToken(findUser);
+  //     if (!isMatchedPass) {
+  //       throw new BadRequestException('Mật khẩu không đúng, vui lòng thử lại');
+  //     }
+  //   }
 
-    // 4. Save to cache session login
-    // await this.redisStore.store.set(
-    //   `${CONST_REDIS.AUTH.LOGIN}:${user.userId}`,
-    //   JSON.stringify(user),
-    //   UtilConverts.convertTimeToMilisecond({
-    //     typeTime: ETime.DAY,
-    //     value: 10,
-    //   }),
-    // );
-    console.log('token:::', token);
+  //   // 3. Create token
+  //   const { token, user } = await this.tokenService.createToken(findUser);
 
+  //   // 4. Save to cache session login
+  //   // await this.redisStore.store.set(
+  //   //   `${CONST_REDIS.AUTH.LOGIN}:${user.userId}`,
+  //   //   JSON.stringify(user),
+  //   //   UtilConverts.convertTimeToMilisecond({
+  //   //     typeTime: ETime.DAY,
+  //   //     value: 10,
+  //   //   }),
+  //   // );
+  //   console.log('token:::', token);
+
+  //   return {
+  //     token,
+  //     user,
+  //   } as IResponseLogin;
+  // }
+  async login(user: LoginDto) {
+    console.log('here');
+    const payload = { user_email: user.user_email };
     return {
-      token,
-      user,
-    } as IResponseLogin;
+      user_email: user.user_email,
+      access_token: this.jwtService.sign(payload),
+    };
   }
-
   async logout(req: Request): Promise<boolean> {
     const dataUser = req['user'];
 
@@ -80,11 +96,11 @@ export class AuthService {
     return true;
   }
 
-  async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOneByEmail(email);
+  async validateUser(user_email: string, user_pass: string): Promise<any> {
+    const user = await this.usersService.findOneByEmail(user_email);
     if (!user) return null;
     const isValidPassword = await UtilTransform.comparePassword({
-      password: pass,
+      password: user_pass,
       passwordHashed: user.user_pass,
     });
 

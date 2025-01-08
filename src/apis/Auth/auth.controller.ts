@@ -6,22 +6,18 @@ import {
   Res,
   Controller,
   UseGuards,
+  Request,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
-import {
-  ChangePasswordAuthDto,
-  CodeAuthDto,
-  LoginDto,
-  RegisterDto,
-} from './auth.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IResponseLogin } from 'src/interfaces/common';
+import { ChangePasswordAuthDto, CodeAuthDto, RegisterDto } from './auth.dto';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UtilCookie } from 'src/utils';
 import { CONST_API_AUTH, CONST_VAL } from 'src/constants';
 import { CoreRes } from 'src/abstracts/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { AuthGuard } from '@/guards/auth.guard';
+import { LoginAuthGuard } from '@/guards/login.guard';
+// import { AuthGuard } from '@/guards/auth.guard';
 // import { CreateCustomerDto } from '../customers/customer.dto';
 
 @Controller()
@@ -33,25 +29,33 @@ export class AuthController {
   ) {}
 
   @Post(CONST_API_AUTH.LOGIN)
+  @UseGuards(LoginAuthGuard)
   @ApiOperation({ summary: 'Đăng nhập' })
-  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
-    const dataLogin: IResponseLogin = await this.authService.login(loginDto);
-
-    return UtilCookie.setCookieToken({
-      res,
-      name: CONST_VAL.TOKEN_NAME,
-      data: dataLogin.token,
-    }).send(
-      new CoreRes.OK({
-        message: 'Đăng nhập thành công',
-        metadata: dataLogin,
-      }),
-    );
+  async login(@Req() req: Request) {
+    console.log('Login request user:', req);
+    // const dataLogin: any = await this.authService.login(req);
+    // console.log('dataLogin', dataLogin);
+    // return UtilCookie.setCookieToken({
+    //   res,
+    //   name: CONST_VAL.TOKEN_NAME,
+    //   data: dataLogin.token,
+    // }).send(
+    //   new CoreRes.OK({
+    //     message: 'Đăng nhập thành công',
+    //     metadata: dataLogin,
+    //   }),
+    // );
+    return new CoreRes.OK({
+      message: 'Đăng nhập thành công',
+      // metadata: dataLogin,
+    });
   }
 
   @Post('register')
-  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Đăng ký' })
   async register(@Body() registerDto: RegisterDto) {
+    console.log('protected');
+
     await this.authService.register(registerDto);
     return new CoreRes.OK({
       message: 'Đăng ký thành công',
@@ -60,6 +64,7 @@ export class AuthController {
   }
 
   @Post('check-code')
+  @ApiOperation({ summary: 'active tài khoảng với code' })
   async checkCode(@Body() registerDto: CodeAuthDto) {
     await this.authService.checkCode(registerDto);
     return new CoreRes.OK({
@@ -68,6 +73,15 @@ export class AuthController {
   }
 
   @Post('retry-active')
+  @ApiOperation({ summary: 'gửi lại mã code' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        user_email: { type: 'string' },
+      },
+    },
+  })
   async retryActive(@Body('user_email') email: string) {
     await this.authService.retryActive(email);
     return new CoreRes.OK({
@@ -76,6 +90,15 @@ export class AuthController {
   }
 
   @Post('retry-password')
+  @ApiOperation({ summary: 'Gửi lại mật khẩu' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        user_email: { type: 'string' },
+      },
+    },
+  })
   async retryPassword(@Body('user_email') email: string) {
     await this.authService.retryPassword(email);
     return new CoreRes.OK({
@@ -84,6 +107,7 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @ApiOperation({ summary: 'Thay đổi mật khẩu' })
   async changePassword(@Body() data: ChangePasswordAuthDto) {
     await this.authService.changePassword(data);
     return new CoreRes.OK({
@@ -92,6 +116,7 @@ export class AuthController {
   }
 
   @Get('mail')
+  @ApiOperation({ summary: 'Gửi mail --- test' })
   async testMail() {
     await this.mailerService.sendMail({
       to: 'tocchienofvu@gmail.com', // list of receivers
@@ -112,7 +137,7 @@ export class AuthController {
   @Post()
   @ApiOperation({ summary: 'Đăng xuất' })
   async logout(@Req() req: Request, @Res() res: Response) {
-    await this.authService.logout(req);
+    // await this.authService.logout(req);
 
     return UtilCookie.clearCookie({ name: CONST_VAL.TOKEN_NAME, res }).send(
       new CoreRes.OK({ message: 'Đăng xuất thành công' }),
@@ -121,12 +146,12 @@ export class AuthController {
 
   @Get()
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
-  async getMe(@Req() req: Request) {
-    const me = await this.authService.getMe(req);
+  async getMe() {
+    // const me = await this.authService.getMe(req);
 
     return new CoreRes.OK({
       message: 'Lấy thông tin cá nhân thành công',
-      metadata: me,
+      // metadata: me,
     });
   }
 }

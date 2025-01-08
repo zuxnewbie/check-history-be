@@ -37,9 +37,11 @@ export class RegisterDto {
 
 export class CodeAuthDto {
   @IsNotEmpty({ message: '_id không được để trống' })
+  @ApiProperty({ default: 'id', name: '_id' })
   _id: string;
 
   @IsNotEmpty({ message: 'code không được để trống' })
+  @ApiProperty({ default: 'abcd', name: 'code' })
   code: string;
 }
 
@@ -68,15 +70,19 @@ export class ResetPasswordDto {
 }
 
 export class ChangePasswordAuthDto {
+  @ApiProperty({ default: 'code' })
   @IsNotEmpty({ message: 'code không được để trống' })
   code: string;
 
+  @ApiProperty({ default: 'user_pass' })
   @IsNotEmpty({ message: 'password không được để trống' })
   user_pass: string;
 
+  @ApiProperty({ default: 'user_confirmPass' })
   @IsNotEmpty({ message: 'confirmPassword không được để trống' })
   user_confirmPass: string;
 
+  @ApiProperty({ default: 'user_email' })
   @IsNotEmpty({ message: 'email không được để trống' })
   user_email: string;
 }
