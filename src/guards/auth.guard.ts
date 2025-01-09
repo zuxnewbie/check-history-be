@@ -21,6 +21,8 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log('in');
+
     const request = context.switchToHttp().getRequest<Request>();
 
     // Check AT
@@ -29,9 +31,7 @@ export class AuthGuard implements CanActivate {
       throw new NotAcceptableException('Token đâu rồi?!');
     }
 
-    const keyStore = await this.tokenModel.findOne({
-      where: { token_code: token },
-    });
+    const keyStore = await this.tokenModel.findOne({ token_code: token });
 
     if (!keyStore) {
       throw new NotAcceptableException('Token không thấy đâu');

@@ -6,19 +6,25 @@ import {
   Res,
   Controller,
   UseGuards,
-  Request,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { ChangePasswordAuthDto, CodeAuthDto, RegisterDto } from './auth.dto';
+import {
+  ChangePasswordAuthDto,
+  CodeAuthDto,
+  LoginDto,
+  RegisterDto,
+} from './auth.dto';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UtilCookie } from 'src/utils';
 import { CONST_API_AUTH, CONST_VAL } from 'src/constants';
 import { CoreRes } from 'src/abstracts/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { LocalAuthGuard } from '@/guards/local.guard';
 import { JwtAuthGuard } from '@/guards/jwt.guard';
 import { Public } from '@/decorators/customize';
+import { IResponseLogin } from '@/interfaces/common';
+import { AuthGuard } from '@/guards/auth.guard';
 // import { AuthGuard } from '@/guards/auth.guard';
 // import { CreateCustomerDto } from '../customers/customer.dto';
 
@@ -31,36 +37,26 @@ export class AuthController {
   ) {}
 
   @Post(CONST_API_AUTH.LOGIN)
-  @UseGuards(LocalAuthGuard)
-  @Public()
   @ApiOperation({ summary: 'Đăng nhập' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        user_email: { type: 'string' },
-        user_password: { type: 'string' },
-      },
-    },
-  })
-  async login(@Request() req: any) {
-    console.log('Login request user:', req);
-    const dataLogin: any = await this.authService.login(req.user);
-    // console.log('dataLogin', dataLogin);
-    // return UtilCookie.setCookieToken({
-    //   res,
-    //   name: CONST_VAL.TOKEN_NAME,
-    //   data: dataLogin.token,
-    // }).send(
-    //   new CoreRes.OK({
-    //     message: 'Đăng nhập thành công',
-    //     metadata: dataLogin,
-    //   }),
-    // );
-    return new CoreRes.OK({
-      message: 'Đăng nhập thành công',
-      metadata: dataLogin,
-    });
+  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+    // const dataLogin: any = await this.authService.login(req.user);
+    const dataLogin: IResponseLogin = await this.authService.login(loginDto);
+    console.log('dataLogin', dataLogin);
+
+    return UtilCookie.setCookieToken({
+      res,
+      name: CONST_VAL.TOKEN_NAME,
+      data: dataLogin.token,
+    }).send(
+      new CoreRes.OK({
+        message: 'Đăng nhập thành công',
+        metadata: dataLogin,
+      }),
+    );
+    // return new CoreRes.OK({
+    //   message: 'Đăng nhập thành công',
+    //   metadata: dataLogin,
+    // });
   }
 
   @Post('register')
@@ -149,26 +145,28 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Đăng xuất' })
   async logout(@Req() req: Request, @Res() res: Response) {
-    // await this.authService.logout(req);
-    res.clearCookie('access_token');
-    // return UtilCookie.clearCookie({ name: CONST_VAL.TOKEN_NAME, res }).send(
-    //   new CoreRes.OK({ message: 'Đăng xuất thành công' }),
-    // );
-    return new CoreRes.OK({
-      message: 'Đăng xuất thành công',
-    });
+    await this.authService.logout(req);
+    // res.clearCookie('access_token');
+    return UtilCookie.clearCookie({ name: CONST_VAL.TOKEN_NAME, res }).send(
+      new CoreRes.OK({ message: 'Đăng xuất thành công' }),
+    );
+    // return new CoreRes.OK({
+    //   message: 'Đăng xuất thành công',
+    // });
   }
 
-  @Get()
+  @Get('get-me')
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
-  async getMe() {
-    // const me = await this.authService.getMe(req);
+  @UseGuards(AuthGuard)
+  async getMe(@Req() req: Request) {
+    const me = await this.authService.getMe(req);
 
     return new CoreRes.OK({
       message: 'Lấy thông tin cá nhân thành công',
-      // metadata: me,
+      metadata: me,
     });
   }
 }

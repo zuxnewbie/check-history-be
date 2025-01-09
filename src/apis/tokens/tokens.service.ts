@@ -70,4 +70,8 @@ export class TokensService {
   async findAll(): Promise<Token[]> {
     return await this.tokenModel.find().exec();
   }
+
+  async removeByUserId(userId: string): Promise<any> {
+    return await this.tokenModel.deleteOne({ token_user: userId }).exec();
+  }
 }
