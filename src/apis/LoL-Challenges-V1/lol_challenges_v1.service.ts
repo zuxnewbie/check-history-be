@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { fetchAccountData } from '@/configs/fetchData';
 
 @Injectable()
 export class LoLChallengesV1Service {
@@ -8,20 +8,37 @@ export class LoLChallengesV1Service {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async getAll(platform: string): Promise<any> {
-    const url = `https://${platform}.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=${this.apiKey}`;
-    try {
-      const response = await lastValueFrom(
-        this.httpService.get(url, {
-          headers: { 'X-Riot-Token': this.apiKey },
-        }),
-      );
-      console.log('response', response, url);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        `Error fetching data for platform ${platform}: ${error.message}`,
-      );
-    }
+  async getConfig(region: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/config?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getPercentiles(region: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/percentiles?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getChallengeConfig(region: string, challengeId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/${challengeId}/config?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getLeaderBoard(
+    region: string,
+    challengeId: string,
+    level: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/${challengeId}/leaderboards/by-level/${level}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getMap(region: string, challengeId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/${challengeId}/percentiles?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getPlyerData(region: string, puuid: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/player-data/${puuid}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

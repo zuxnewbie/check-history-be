@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { fetchAccountData } from '@/configs/fetchData';
 
 @Injectable()
 export class AccountV1Service {
@@ -8,20 +8,17 @@ export class AccountV1Service {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async getAllAccount(platform: string): Promise<any> {
-    const url = `https://${platform}.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=${this.apiKey}`;
-    try {
-      const response = await lastValueFrom(
-        this.httpService.get(url, {
-          headers: { 'X-Riot-Token': this.apiKey },
-        }),
-      );
-      console.log('response', response, url);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        `Error fetching data for platform ${platform}: ${error.message}`,
-      );
-    }
+  async getAccountByPuuid(region: string, puuid: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/riot/account/v1/accounts/by-puuid/${puuid}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getAccountByRiotID(
+    region: string,
+    gameName: string,
+    tagLine: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

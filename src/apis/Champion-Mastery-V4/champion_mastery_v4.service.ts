@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { fetchAccountData } from '@/configs/fetchData';
 
 @Injectable()
 export class ChampionMasteryV4Service {
@@ -8,20 +8,33 @@ export class ChampionMasteryV4Service {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async getAll(platform: string): Promise<any> {
-    const url = `https://${platform}.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=${this.apiKey}`;
-    try {
-      const response = await lastValueFrom(
-        this.httpService.get(url, {
-          headers: { 'X-Riot-Token': this.apiKey },
-        }),
-      );
-      console.log('response', response, url);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        `Error fetching data for platform ${platform}: ${error.message}`,
-      );
-    }
+  async getAll(region: string, encryptedPUUID: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${encryptedPUUID}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getAChampionMastery(
+    region: string,
+    encryptedPUUID: string,
+    championId: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${encryptedPUUID}/by-champion/${championId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getSpecifiedNumberOfTop(
+    region: string,
+    encryptedPUUID: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${encryptedPUUID}/top?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getPlayerTotalChampionMasteryScore(
+    region: string,
+    encryptedPUUID: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/champion-mastery/v4/scores/by-puuid/${encryptedPUUID}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

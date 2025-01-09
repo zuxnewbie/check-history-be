@@ -7,16 +7,16 @@ import { LoLStatusV4Service } from './lol_status_v4.service';
 @ApiTags('LoLStatusV4')
 export class LoLStatusV4Controller {
   constructor(private readonly LoLStatusV4Service: LoLStatusV4Service) {}
-  @Get(':lol-status-v4')
-  @ApiOperation({ summary: 'Check lol-status-v4' })
-  async getAllChampion(@Query('platform') platform: string) {
-    if (!platform) {
-      throw new Error('Platform is required!');
+  @Get('lol-status-v4')
+  @ApiOperation({ summary: '' })
+  async getAllChampion(@Query('region') region: string) {
+    if (!region) {
+      throw new Error('region is required!');
     }
-    const results = await this.LoLStatusV4Service.getAll(platform);
+    const results = await this.LoLStatusV4Service.getAllChampion(region);
 
     return new CoreRes.OK({
-      message: 'Lấy tất cả lol-status-v4 thành công',
+      message: 'Lấy tất cả thành công',
       statusCode: results.status,
       metadata: results,
     });

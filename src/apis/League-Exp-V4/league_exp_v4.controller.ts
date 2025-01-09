@@ -7,16 +7,26 @@ import { LeagueExpV4Service } from './league_exp_v4.service';
 @ApiTags('LeagueExpV4')
 export class LeagueExpV4Controller {
   constructor(private readonly LeagueExpV4Service: LeagueExpV4Service) {}
-  @Get(':league-exp-v4')
-  @ApiOperation({ summary: 'Check league-exp-v4' })
-  async getAllChampion(@Query('platform') platform: string) {
-    if (!platform) {
-      throw new Error('Platform is required!');
+  @Get('league-exp-v4')
+  @ApiOperation({ summary: 'Get all the league entries' })
+  async getLeagueExp(
+    @Query('region') region: string,
+    @Query('queue') queue: string,
+    @Query('tier') tier: string,
+    @Query('division') division: string,
+  ) {
+    if (!region) {
+      throw new Error('region is required!');
     }
-    const results = await this.LeagueExpV4Service.getAll(platform);
+    const results = await this.LeagueExpV4Service.getLeagueExp(
+      region,
+      queue,
+      tier,
+      division,
+    );
 
     return new CoreRes.OK({
-      message: 'Lấy tất cả league-exp-v4 thành công',
+      message: 'Lấy tất cả thành công',
       statusCode: results.status,
       metadata: results,
     });

@@ -7,16 +7,16 @@ import { MatchV5Service } from './match_v5.service';
 @ApiTags('MatchV5')
 export class MatchV5Controller {
   constructor(private readonly MatchV5Service: MatchV5Service) {}
-  @Get(':match-v5')
-  @ApiOperation({ summary: 'Check match-v5' })
-  async getAllChampion(@Query('platform') platform: string) {
-    if (!platform) {
-      throw new Error('Platform is required!');
+  @Get('match-v5')
+  @ApiOperation({ summary: '' })
+  async getAllChampion(@Query('region') region: string) {
+    if (!region) {
+      throw new Error('region is required!');
     }
-    const results = await this.MatchV5Service.getAll(platform);
+    const results = await this.MatchV5Service.getAllChampion(region);
 
     return new CoreRes.OK({
-      message: 'Lấy tất cả match-v5 thành công',
+      message: 'Lấy tất cả thành công',
       statusCode: results.status,
       metadata: results,
     });

@@ -7,13 +7,16 @@ import { CoreRes } from 'src/abstracts/common';
 @ApiTags('Champion V3')
 export class ChampionV3Controller {
   constructor(private readonly ChampionV3Service: ChampionV3Service) {}
-  @Get(':champion-v3')
-  @ApiOperation({ summary: 'Check champion v3' })
-  async getAllChampion(@Query('platform') platform: string) {
-    if (!platform) {
-      throw new Error('Platform is required!');
+  @Get('champion-v3')
+  @ApiOperation({
+    summary:
+      'Trả lại vòng quay vô địch, bao gồm vòng quay miễn phí và vòng quay miễn phí cấp thấp (REST)',
+  })
+  async getAllChampion(@Query('region') region: string) {
+    if (!region) {
+      throw new Error('region is required!');
     }
-    const results = await this.ChampionV3Service.getAll(platform);
+    const results = await this.ChampionV3Service.getChampionRotations(region);
 
     return new CoreRes.OK({
       message: 'Lấy tất cả Champion v3 thành công',

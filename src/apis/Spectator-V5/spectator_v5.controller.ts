@@ -7,16 +7,16 @@ import { SpectatorV5Service } from './spectator_v5.service';
 @ApiTags('SpectatorV5')
 export class SpectatorV5Controller {
   constructor(private readonly SpectatorV5Service: SpectatorV5Service) {}
-  @Get(':spectator-v5')
-  @ApiOperation({ summary: 'Check spectator-v5' })
-  async getAllChampion(@Query('platform') platform: string) {
-    if (!platform) {
-      throw new Error('Platform is required!');
+  @Get('spectator-v5')
+  @ApiOperation({ summary: '' })
+  async getAllChampion(@Query('region') region: string) {
+    if (!region) {
+      throw new Error('region is required!');
     }
-    const results = await this.SpectatorV5Service.getAll(platform);
+    const results = await this.SpectatorV5Service.getAllChampion(region);
 
     return new CoreRes.OK({
-      message: 'Lấy tất cả spectator-v5 thành công',
+      message: 'Lấy tất cả thành công',
       statusCode: results.status,
       metadata: results,
     });

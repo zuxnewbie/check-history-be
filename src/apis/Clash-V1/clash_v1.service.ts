@@ -1,27 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { fetchAccountData } from '@/configs/fetchData';
 
 @Injectable()
 export class ClashV1Service {
   private readonly apiKey = process.env.RIOT_API_KEY;
 
   constructor(private readonly httpService: HttpService) {}
+  async getPlayer(region: string, puuid: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/clash/v1/players/by-puuid/${puuid}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
 
-  async getAll(platform: string): Promise<any> {
-    const url = `https://${platform}.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=${this.apiKey}`;
-    try {
-      const response = await lastValueFrom(
-        this.httpService.get(url, {
-          headers: { 'X-Riot-Token': this.apiKey },
-        }),
-      );
-      console.log('response', response, url);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        `Error fetching data for platform ${platform}: ${error.message}`,
-      );
-    }
+  async getPlayerBySummoner(region: string, summonerId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/clash/v1/players/by-summoner/${summonerId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getTeam(region: string, teamId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/clash/v1/teams/${teamId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getTournaments(region: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/clash/v1/tournaments?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getTournamentsByTeam(region: string, teamId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/clash/v1/tournaments/by-team/${teamId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getTournamentsById(region: string, tournamentId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/clash/v1/tournaments/${tournamentId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

@@ -7,16 +7,16 @@ import { SummonerV4Service } from './summoner_v4.service';
 @ApiTags('SummonerV4')
 export class SummonerV4Controller {
   constructor(private readonly SummonerV4Service: SummonerV4Service) {}
-  @Get(':summoner-v4')
-  @ApiOperation({ summary: 'Check summoner-v4' })
-  async getAllChampion(@Query('platform') platform: string) {
-    if (!platform) {
-      throw new Error('Platform is required!');
+  @Get('summoner-v4')
+  @ApiOperation({ summary: '' })
+  async getAllChampion(@Query('region') region: string) {
+    if (!region) {
+      throw new Error('region is required!');
     }
-    const results = await this.SummonerV4Service.getAll(platform);
+    const results = await this.SummonerV4Service.getAllChampion(region);
 
     return new CoreRes.OK({
-      message: 'Lấy tất cả summoner-v4 thành công',
+      message: 'Lấy tất cả thành công',
       statusCode: results.status,
       metadata: results,
     });
