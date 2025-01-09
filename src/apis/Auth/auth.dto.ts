@@ -4,7 +4,7 @@ import { MESS_ERROR_VN } from 'src/constants';
 
 export class LoginDto {
   @IsEmail({}, { message: MESS_ERROR_VN.EMAIL })
-  @ApiProperty({ default: 'zzz@gmail.com' })
+  @ApiProperty({ default: 'tocchienofvu@gmail.com' })
   user_email: string;
 
   @ApiProperty({ default: 'admin123@' })

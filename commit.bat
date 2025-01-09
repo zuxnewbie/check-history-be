@@ -18,7 +18,16 @@ set /p commitMessage=Enter commit message:
 :: Execute git commands
 git add .
 git commit -m "%commitMessage%"
-git push origin %branchName%
+
+:: Check if the branch has an upstream
+git rev-parse --abbrev-ref --symbolic-full-name @{u} >nul 2>&1
+if errorlevel 1 (
+    echo No upstream branch set for "%branchName%".
+    echo Setting upstream branch...
+    git push --set-upstream origin %branchName%
+) else (
+    git push origin %branchName%
+)
 
 :: Display completion message
 echo ------------------------------------
