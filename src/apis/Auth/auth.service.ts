@@ -80,9 +80,9 @@ export class AuthService {
   //     user,
   //   } as IResponseLogin;
   // }
-  async login(user: LoginDto) {
+  async login(user: any) {
     console.log('here');
-    const payload = { user_email: user.user_email };
+    const payload = { username: user.user_email, sub: user._id };
     return {
       user_email: user.user_email,
       access_token: this.jwtService.sign(payload),

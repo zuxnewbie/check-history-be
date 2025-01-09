@@ -7,9 +7,9 @@ import { Token, TokenSchema } from '../tokens/token.schema';
 import { TokensModule } from '../tokens/tokens.module';
 import { User, UserSchema } from '../Users/user.schema';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigService } from '@nestjs/config';
-import { LoginStrategy } from '@/guards/login.guard';
-import { JwtAuthGuard } from '@/guards/register.guard';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LocalStrategy } from '@/guards/local.guard';
+import { JwtStrategy } from '@/guards/jwt.guard';
 
 @Global()
 @Module({
@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '@/guards/register.guard';
     forwardRef(() => TokensModule),
     PassportModule,
     JwtModule.registerAsync({
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         global: true,
         secret: configService.get<string>('JWT_SECRET'),
@@ -30,7 +31,7 @@ import { JwtAuthGuard } from '@/guards/register.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LoginStrategy, JwtAuthGuard],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -16,7 +16,9 @@ import { UtilCookie } from 'src/utils';
 import { CONST_API_AUTH, CONST_VAL } from 'src/constants';
 import { CoreRes } from 'src/abstracts/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { LoginAuthGuard } from '@/guards/login.guard';
+import { LocalAuthGuard } from '@/guards/local.guard';
+import { JwtAuthGuard } from '@/guards/jwt.guard';
+import { Public } from '@/decorators/customize';
 // import { AuthGuard } from '@/guards/auth.guard';
 // import { CreateCustomerDto } from '../customers/customer.dto';
 
@@ -29,11 +31,21 @@ export class AuthController {
   ) {}
 
   @Post(CONST_API_AUTH.LOGIN)
-  @UseGuards(LoginAuthGuard)
+  @UseGuards(LocalAuthGuard)
+  @Public()
   @ApiOperation({ summary: 'Đăng nhập' })
-  async login(@Req() req: Request) {
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        user_email: { type: 'string' },
+        user_password: { type: 'string' },
+      },
+    },
+  })
+  async login(@Request() req: any) {
     console.log('Login request user:', req);
-    // const dataLogin: any = await this.authService.login(req);
+    const dataLogin: any = await this.authService.login(req.user);
     // console.log('dataLogin', dataLogin);
     // return UtilCookie.setCookieToken({
     //   res,
@@ -47,11 +59,13 @@ export class AuthController {
     // );
     return new CoreRes.OK({
       message: 'Đăng nhập thành công',
-      // metadata: dataLogin,
+      metadata: dataLogin,
     });
   }
 
   @Post('register')
+  @Public()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Đăng ký' })
   async register(@Body() registerDto: RegisterDto) {
     console.log('protected');
@@ -134,14 +148,17 @@ export class AuthController {
     });
   }
 
-  @Post()
+  @Post('logout')
   @ApiOperation({ summary: 'Đăng xuất' })
   async logout(@Req() req: Request, @Res() res: Response) {
     // await this.authService.logout(req);
-
-    return UtilCookie.clearCookie({ name: CONST_VAL.TOKEN_NAME, res }).send(
-      new CoreRes.OK({ message: 'Đăng xuất thành công' }),
-    );
+    res.clearCookie('access_token');
+    // return UtilCookie.clearCookie({ name: CONST_VAL.TOKEN_NAME, res }).send(
+    //   new CoreRes.OK({ message: 'Đăng xuất thành công' }),
+    // );
+    return new CoreRes.OK({
+      message: 'Đăng xuất thành công',
+    });
   }
 
   @Get()

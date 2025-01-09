@@ -8,9 +8,12 @@ import {
 import { AuthService } from '@/apis/Auth/auth.service';
 
 @Injectable()
-export class LoginStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
-    super();
+    super({
+      usernameField: 'user_email',
+      passwordField: 'user_password',
+    });
   }
 
   async validate(user_email: string, user_pass: string): Promise<any> {
@@ -26,4 +29,4 @@ export class LoginStrategy extends PassportStrategy(Strategy) {
 }
 
 @Injectable()
-export class LoginAuthGuard extends AuthGuard('local') {}
+export class LocalAuthGuard extends AuthGuard('local') {}

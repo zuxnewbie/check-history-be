@@ -15,6 +15,9 @@ export class LoginDto {
     }),
   })
   user_pass: string;
+
+  // @ApiProperty({ default: 'access_token' })
+  // access_token: string;
 }
 
 export class RegisterDto {
