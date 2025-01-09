@@ -1,14 +1,27 @@
 @echo off
-:: Nhắc nhập commit message
-set /p commitMessage=Nhập commit message: 
+:: Display the list of branches
+echo Available branches:
+git branch
+echo.
 
-:: Thực hiện các lệnh git
+:: Prompt the user to enter the branch name
+set /p branchName=Enter the branch name to push (default: current branch): 
+
+:: If no branch name is entered, use the current branch
+if "%branchName%"=="" (
+    for /f "tokens=2 delims=* " %%a in ('git branch ^| findstr "*"') do set branchName=%%a
+)
+
+:: Prompt the user to enter a commit message
+set /p commitMessage=Enter commit message: 
+
+:: Execute git commands
 git add .
 git commit -m "%commitMessage%"
-git push
+git push origin %branchName%
 
-:: Hiển thị thông báo hoàn tất
+:: Display completion message
 echo ------------------------------------
-echo Commit và push code hoàn tất!
+echo Code committed and pushed to branch "%branchName%" successfully!
 echo ------------------------------------
 pause
