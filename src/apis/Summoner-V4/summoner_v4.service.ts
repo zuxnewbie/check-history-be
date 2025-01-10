@@ -7,8 +7,37 @@ export class SummonerV4Service {
   private readonly apiKey = process.env.RIOT_API_KEY;
 
   constructor(private readonly httpService: HttpService) {}
-  async getAllChampion(region: string): Promise<any> {
-    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/config?api_key=${this.apiKey}`;
+  async getSummonerByRsoPuuid(region: string, rsoPUUID: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/fulfillment/v1/summoners/by-puuid/${rsoPUUID}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getSummonerByAccountId(
+    region: string,
+    encryptedAccountId: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-account/${encryptedAccountId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getSummonerByPuuid(
+    region: string,
+    encryptedPUUID: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${encryptedPUUID}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getSummonerMe(region: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/me?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getSummonerId(
+    region: string,
+    encryptedSummonerId: string,
+  ): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${encryptedSummonerId}?api_key=${this.apiKey}`;
     return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

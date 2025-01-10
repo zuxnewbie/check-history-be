@@ -7,8 +7,18 @@ export class MatchV5Service {
   private readonly apiKey = process.env.RIOT_API_KEY;
 
   constructor(private readonly httpService: HttpService) {}
-  async getAllChampion(region: string): Promise<any> {
-    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/config?api_key=${this.apiKey}`;
+  async getMatchByPuuid(region: string, puuid: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getMatchByMatchId(region: string, matchId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/match/v5/matches/${matchId}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getMatchTimeLine(region: string, matchId: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/match/v5/matches/${matchId}/timeline?api_key=${this.apiKey}`;
     return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

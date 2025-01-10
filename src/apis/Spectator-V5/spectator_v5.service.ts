@@ -7,8 +7,13 @@ export class SpectatorV5Service {
   private readonly apiKey = process.env.RIOT_API_KEY;
 
   constructor(private readonly httpService: HttpService) {}
-  async getAllChampion(region: string): Promise<any> {
-    const url = `https://${region}.api.riotgames.com/lol/challenges/v1/challenges/config?api_key=${this.apiKey}`;
+  async getSpectator(region: string, encryptedPUUID: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${encryptedPUUID}?api_key=${this.apiKey}`;
+    return fetchAccountData(this.httpService, this.apiKey, url);
+  }
+
+  async getListFeaturedGame(region: string): Promise<any> {
+    const url = `https://${region}.api.riotgames.com/lol/spectator/v5/featured-games?api_key=${this.apiKey}`;
     return fetchAccountData(this.httpService, this.apiKey, url);
   }
 }

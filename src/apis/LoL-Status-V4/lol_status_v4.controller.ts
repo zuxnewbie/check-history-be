@@ -9,11 +9,11 @@ export class LoLStatusV4Controller {
   constructor(private readonly LoLStatusV4Service: LoLStatusV4Service) {}
   @Get('lol-status-v4')
   @ApiOperation({ summary: '' })
-  async getAllChampion(@Query('region') region: string) {
+  async getStatus(@Query('region') region: string) {
     if (!region) {
       throw new Error('region is required!');
     }
-    const results = await this.LoLStatusV4Service.getAllChampion(region);
+    const results = await this.LoLStatusV4Service.getStatus(region);
 
     return new CoreRes.OK({
       message: 'Lấy tất cả thành công',
